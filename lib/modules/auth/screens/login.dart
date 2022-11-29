@@ -24,7 +24,7 @@ class LoginScreen extends StatelessWidget {
                   text: "Do not have an account?",
                   textLink: "Create an account now!",
                 ),
-                Footer()
+                Footer(),
               ],
             ),
           ),

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+// Providers
+import 'package:flutter_02_chat/modules/auth/providers/auth.dart';
 // Widgets
-import 'package:flutter_02_chat/modules/shared/widgets/widgets.dart';
+import 'package:flutter_02_chat/modules/shared/widgets/_widgets.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({
@@ -17,6 +20,8 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+
     return Container(
       margin: const EdgeInsets.only(top: 40),
       padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -35,9 +40,22 @@ class _LoginFormState extends State<LoginForm> {
               controller: passwordCtrl),
           CustomButton(
             title: "Login",
-            onPress: () {
-              print(emailCtrl.text);
-            },
+            onPress: authProvider.getAuthenticating
+                ? null
+                : () async {
+                    final email = emailCtrl.text.trim();
+                    final password = passwordCtrl.text.trim();
+                    if (email.isEmpty && password.isEmpty) return;
+                    final loginOk = await authProvider.login(email, password);
+                    if (!mounted) return;
+                    FocusScope.of(context).unfocus();
+                    if (loginOk != true) {
+                      showCustomAlert(context, "Error on login", loginOk);
+                    } else {
+                      // TODO: Socket server
+                      Navigator.pushReplacementNamed(context, "users");
+                    }
+                  },
           )
         ],
       ),
